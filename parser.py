@@ -76,7 +76,7 @@ def Parser(Tokens, ParseTable):
         if top == a:             # Comparing if the topmost element of the stack same as the encountered token character or not
             matched += top       # Matched is the string that contains the elements that have been matched upto now
             action = 'match ' + top.   # Tells what action has been taken, here matching of the terminal has been done 
-            #s.pop()              
+            s.pop()              
             putContents(matched, getStack(s), Tokens[i:len(Tokens)], action, j, moves)
             j = j + 1            # increment j which keeps the counter of which row to be filled in the output table
             i = i + 1            # increment the index of the token character
@@ -95,7 +95,7 @@ def Parser(Tokens, ParseTable):
             putContents(matched, getStack(s), Tokens[i:len(Tokens)], action, j, moves)
             j = j + 1
         
-        s.pop()
+        #s.pop()
         top = s[len(s)-1]
 
     if error != 1:             # If no error was encountered then print the output table
