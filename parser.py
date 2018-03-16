@@ -1,10 +1,10 @@
 import importlib
 import pandas as pd
 import numpy as np
-from collections import defaultdict
 import re
+from collections import defaultdict
 
-################################
+###########################################
 
 #----------------------
 #Grammar:   (for do while loop)
@@ -15,198 +15,222 @@ import re
 #F -> e
 #----------------------
 
-#################################
+###########################################
+#lexer
 
-def lexer()
-k = 1
+def lexer():
+    k = 1
 
-with open('input.txt') as f:
-    array = f.readlines()
+    with open('input.txt') as f:
+        array = f.readlines()
 
-array = [x.strip() for x in array]
-array = [x.split(" ") for x in array]
+        array = [x.strip() for x in array]
+        array = [x.split(" ") for x in array]
 #array = []
 
 #for i in range(T):
 #    array.append(f.readline().strip().split(' '))
 
-f.close()
+    f.close()
 
 #print(array)
 #token_dict
-token = defaultdict(list)
-tokens = []
-keywords = ['__LINE__', '__ENCODING__', '__FILE__', 'BEGIN', 'END', 'alias',
-'and', 'begin', 'break', 'case', 'class', 'def', 'defined?', 'do', 'else',
-'elsif', 'end', 'ensure', 'for', 'false', 'if', 'in', 'module', 'next', 'nil',
-'not', 'or', 'redo', 'rescue', 'retry', 'return', 'self', 'super', 'then', 'true'
-, 'undef', 'unless', 'until', 'when', 'while', 'yield', 'loop']
+    token = defaultdict(list)
+    tokens = []
+    keywords = ['__LINE__', '__ENCODING__', '__FILE__', 'BEGIN', 'END', 'alias',
+    'and', 'begin', 'break', 'case', 'class', 'def', 'defined?', 'do', 'else',
+    'elsif', 'end', 'ensure', 'for', 'false', 'if', 'in', 'module', 'next', 'nil',
+    'not', 'or', 'redo', 'rescue', 'retry', 'return', 'self', 'super', 'then', 'true'
+    , 'undef', 'unless', 'until', 'when', 'while', 'yield', 'loop']
 
-punctuators = ['[', ']', '(', ')', '{', '}', '::', ',', ';', '..', '...', '?',
-':', '=>']
+    punctuators = ['[', ']', '(', ')', '{', '}', '::', ',', ';', '..', '...', '?',
+    ':', '=>']
 
-operators = ['!', '!=', '!-', '&&', '||', '=', '^', '&', '|', '<=>', '==', '==='
-, '=-', '>', '>=', '<', '<=', '<<', '>>', '+', '-', '*', '/', '%', '**', '+@',
-'-@', '[]', '[]=', '\'', '\"']
+    operators = ['!', '!=', '!-', '&&', '||', '=', '^', '&', '|', '<=>', '==', '==='
+    , '=-', '>', '>=', '<', '<=', '<<', '>>', '+', '-', '*', '/', '%', '**', '+@',
+    '-@', '[]', '[]=', '\'', '\"']
 
-for word in array:
-   for words in word:
-      if words in keywords:
-          token["Keyword"].append(words)
-          if words == 'loop':
-              tokens.append('l')
-          if words == 'do':
-              tokens.append('d')
-          if words == 'break':
-              tokens.append('b')
-          if words == 'if':
-              tokens.append('i')
-          if words == 'true':
-              tokens.append('t')
-          if words == 'false':
-              tokens.append('f')
-          if words == 'end':
-              tokens.append('e')
-      elif words in punctuators:
-          token["Punctuator"].append(words)
-      elif words in operators:
-          token["Operator"].append(words)
-      elif re.search(r"^[+-]?(0|[1-9](_?[0-9])*)$", words) or re.search(r"^()[+|-]?0(d|D)[0-9](_?[0-9])*$", words) or re.search(r"^0[bB][01](_?[0|1])*$", words):
-          token["Literal"].append(words)
-      elif re.search(r"^0(_|o|O)?[0-7](_?[0-7])*$", words) or re.search(r"^0(x|X)[0-9a-fA-F](_?[0-9a-fA-F])*$", words) or re.search(r"^[+-]?([0-9](_?[0-9])*)?\.\d+(_?[0-9])*$", words):
+    for word in array:
+        for words in word:
+            if words in keywords:
+                token["Keyword"].append(words)
+                if words == 'loop':
+                    tokens.append('l')
+                if words == 'do':
+                    tokens.append('d')
+                if words == 'break':
+                    tokens.append('b')
+                if words == 'if':
+                    tokens.append('i')
+                if words == 'true':
+                    tokens.append('t')
+                if words == 'false':
+                    tokens.append('f')
+                if words == 'end':
+                    tokens.append('e')
+            elif words in punctuators:
+                token["Punctuator"].append(words)
+            elif words in operators:
+                token["Operator"].append(words)
+                tokens.append('@')
+            elif re.search(r"^[+-]?(0|[1-9](_?[0-9])*)$", words) or re.search(r"^()[+|-]?0(d|D)[0-9](_?[0-9])*$", words) or re.search(r"^0[bB][01](_?[0|1])*$", words):
+                token["Literal"].append(words)
+                tokens.append('@')
+            elif re.search(r"^0(_|o|O)?[0-7](_?[0-7])*$", words) or re.search(r"^0(x|X)[0-9a-fA-F](_?[0-9a-fA-F])*$", words) or re.search(r"^[+-]?([0-9](_?[0-9])*)?\.\d+(_?[0-9])*$", words):
       #re.search(r"^[+-]?\d+(?:\.\d+)$", words):
-          token["Literal"].append(words)
-      elif re.search(r"^(?![0-9]).+$", words):
-          if re.search(r"^((\$|\@|@@)[0-9]*)?[a-zA-Z_]+[a-zA-Z0-9_]*$", words) or re.search(r"^[a-zA-Z_]+[a-zA-Z0-9]*(!|\?|=)$", words) or (r"^[A-Z]+[a-zA-Z0-9_]*$", words):
-              token["Identifier"].append(words)
-              if words == 'x':
-                  tokens.append('x')
-              else:
-                  tokens.append('@')
-      elif re.search(r"^[+-]?([0-9](_?[0-9])*)\.\d+((_?[0-9])*|(0|[1-9](_?[0-9])*))[eE][+-]?[0-9](_?[0-9])*$", words):
-          token["Literal"].append(words)
-      elif re.search(r"^\'(\\|\')*\'$", words) or re.search(r"^$", words):
-          token["Literal"].append(words)
-      else:
-          print(words, ": Invalid token")
-          k = 0
-          break
+                token["Literal"].append(words)
+                tokens.append('@')
+            elif re.search(r"^(?![0-9]).+$", words):
+                if re.search(r"^((\$|\@|@@)[0-9]*)?[a-zA-Z_]+[a-zA-Z0-9_]*$", words) or re.search(r"^[a-zA-Z_]+[a-zA-Z0-9]*(!|\?|=)$", words) or (r"^[A-Z]+[a-zA-Z0-9_]*$", words):
+                    token["Identifier"].append(words)
+                if words == 'x':
+                    tokens.append('x')
+                else:
+                    tokens.append('@')
+            elif re.search(r"^[+-]?([0-9](_?[0-9])*)\.\d+((_?[0-9])*|(0|[1-9](_?[0-9])*))[eE][+-]?[0-9](_?[0-9])*$", words):
+                token["Literal"].append(words)
+                tokens.append('@')
+            elif re.search(r"^\'(\\|\')*\'$", words) or re.search(r"^$", words):
+                token["Literal"].append(words)
+                tokens.append('@')
+            else:
+                print(words, ": Invalid token")
+                k = 0
+                break
 
-if k != 0:
+    if k != 0:
   # print(token)
-   return tokens
+        return tokens
+    else:
+        return -1
 
 #for key, value in token.items():
 #    for v in value:
 #        if v == 'for':
 #            print(key)
 
-###########################################
+###################################################
 
-#Function to check whether the top most element of the existing stack is a terminal or not
+#Parser
+
 def isTerminal(top):
-    if top < 97 or top > 122:
-        return false
+    if ord(top) < 97 or ord(top) > 122:
+        return False
     else:
-        return true
+        return True
 
-#Function to name the headers of the final output table
-def Table():
-    header = ['MATCHED', 'STACK', 'INPUT', 'ACTION']
-    moves = pd.DataFrame(columns = header)
-    return moves
 
-#Function to get the existing stack elements in the form of a string
-def getstack(s):
+def getStack(s):
     stack = ''
     k = len(s) - 1
     while (k >= 0):
-        stack + s[k]
+        stack = stack + s[k]
         k = k - 1
+    stack = stack[::-1]
+    #print(stack)
+    return stack
 
-#Function to fill the final output table
-def putContents(matched, stack, input_buf, action, j, moves):
-    moves.iloc[j] = pd.Series({'MATCHED':matched, 'STACK':stack, 'INPUT':input_buf, 'ACTION':action})
+def putContents(matched, stack, input_buf, action, df):
+    data = pd.DataFrame({'MATCHED':matched, 'STACK':stack, 'INPUT':input_buf, 'ACTION':action})
+    return df.append(data)
 
-#Function to check whether the encountered production (in the parse table) is present in the list of productions or not
 def match(element, prod):
     if element in prod:
-        return true
+        return True
     else:
-        return false
+        return False
 
-#Function to place the RHS of the production (whose LHS is a non-terminal) on the stack by replacing the corresponding 
-#non-terminal (the LHS)
 def replaceTop(production, s):
     s.pop()
     i = len(production)-1
     while (i >= 3):
         s.append(production[i])
+        i = i - 1
 
 
 def Parser(tokens, ParseTable):
 
-    moves = Table()          # For making the output table
-    prod = ['S->ldcr', 'C->x', 'R->biE', 'E->fS', 'E->tF', 'F->e']   # Listing the productions of the construct
-    i = 0, j = 0, error = 0
+    #moves = Table()
+    df = pd.DataFrame()
+    prod = ['S->ldCR', 'C->x', 'R->biE', 'E->fS', 'E->tF', 'F->e']
+    i = 0
+    error = 0
+    count = 0
 
-    s = []                   # Initializing stack as a list
-    s.append('~')            # Placing ~ to represent an empty stack
-    a = tokens[i]            # a takes in the input characters one by one
-    s.append('S')            # Appending the first non-terminal, the start symbol
-    top = s[len(s)-1]        # top contains the topmost element of the stack
-    action = ''              
+    s = []
+    s.append('~')
+    a = tokens[i]
+    s.append('S')
+    top = s[len(s)-1]
+    action = ''
     matched = ''
-    putContents(matched, getStack(s), tokens[i:len(tokens)], action, j, moves)
-    j = j + 1
+    input_buf = ''
+    j = i
+    while j < len(tokens):
+        input_buf = tokens[j] + input_buf
+        j = j + 1
+    #print(input_buf)
+    df = putContents(matched, getStack(s), tokens[i:len(tokens)], action, df)
 
-    while (top != '~'):          # Continue till the stack is empty 
-        if top == a:             # Comparing if the topmost element of the stack same as the encountered token character or not
-            matched += top       # Matched is the string that contains the elements that have been matched upto now
-            action = 'match ' + top.   # Tells what action has been taken, here matching of the terminal has been done 
-            s.pop()              
-            putContents(matched, getStack(s), tokens[i:len(tokens)], action, j, moves)
-            j = j + 1            # increment j which keeps the counter of which row to be filled in the output table
-            i = i + 1            # increment the index of the token character
-            a = token[i]         # Taking the next token character
-        else if isTerminal(top):      # Check if any other terminal appears on the top of the stack than the allowed terminal in the input
-            print ('Parsing Error')   # If yes, then it is an error
+    while (top != '~'):
+        if a == '@':
+            print ('Parsing Error')
             error = 1
             break
-        else if ParseTable.iloc[top, a] == 'NaN':       # If no production corresponding to the encountered terminal and non terminal is found in the table
-            print ('Parsing Error')                     # then it is an error 
+        elif top == a:
+            matched += top
+            action = 'match ' + top
+            s.pop()
+            #print(s)
+            df = putContents(matched, getStack(s), tokens[i:len(tokens)], action, df)
+            if a == 'f':
+                i = 0
+                a = tokens[i]
+                count = count + 1
+            else:
+                i = i + 1
+                if i < len(tokens):
+                    a = tokens[i]
+                else:
+                    break
+            if count == 5:
+                break
+        elif isTerminal(top):
+            #print(top)
+            print ('Parsing Error')
             error = 1
             break
-        else if match(ParseTable.iloc[top, a], prod):   # If the cuurent topmost element of the stack is a non-terminal, then replace the non-terminal by its production 
-            action = 'output '+ ParseTable.iloc[top, a] # on the stack, with the new topmost element as the leftmost element of the production's RHS
-            replaceTop(ParseTable.iloc[top, a], s)
-            putContents(matched, getStack(s), tokens[i:len(tokens)], action, j, moves)
-            j = j + 1
-        
-        #s.pop()
+        elif ParseTable.loc[top, a] == ' ':
+            print ('Parsing Error')
+            #print(a)
+            error = 1
+            break
+        elif match(ParseTable.loc[top, a], prod):
+            action = 'output '+ ParseTable.loc[top, a]
+            matched = ''
+            replaceTop(ParseTable.loc[top, a], s)
+            df = putContents(matched, getStack(s), tokens[i:len(tokens)], action, df)
+        else:
+            print('Parsing error')
+            error = 1
+            break
+
         top = s[len(s)-1]
+        #print(top)
 
-    if error != 1:             # If no error was encountered then print the output table
-        print(moves)
+    if error != 1:
+        print(df)
 
 
-# Parse table
-# Rows are named by non-terminals
-# Columns are named by terminals
+
 index = ['S', 'C', 'R', 'E', 'F']
 columns = ['b', 'd', 'e', 'f', 'i', 'l', 't', 'x']
 
-# Filling the appropriate cells of the parse table with appropriate productions
-ParseTable = pd.DataFrame(index = index, columns = columns)
-ParseTable.loc['S', 'l'] = pd.Series({'l':'S->ldcr'})
-ParseTable.loc['C', 'x'] = pd.Series({'x':'C->x'})
-ParseTable.loc['R', 'b'] = pd.Series({'b':'R->biE'})
-ParseTable.loc['E', 'f'] = pd.Series({'f':'E->fS'})
-ParseTable.loc['E', 'f'] = pd.Series({'t':'E->tF'})
-ParseTable.loc['F', 'e'] = pd.Series({'e':'F->e'})
+values = {'l':['S->ldCR', ' ', ' ', ' ', ' '], 'x':[' ', 'C->x', ' ', ' ', ' '], 'b':[' ', ' ', 'R->biE', ' ', ' '],
+'f':[' ', ' ', ' ', 'E->fS', ' '], 't':[' ', ' ', ' ', 'E->tF', ' '], 'e':[' ', ' ', ' ', ' ', 'F->e']}
+ParseTable = pd.DataFrame(values, index = index, columns = columns)
 
 tokens = lexer()
 
-Parser(tokens, ParseTable)
-
-#print(ParseTable)
+if tokens != -1:
+    Parser(tokens, ParseTable)
